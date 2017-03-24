@@ -38,7 +38,7 @@ You can provide a cache directory and/or a cache name:
         ...
         return result
 
-Or as a shorcut, use it without arguments (as a decorator, `@memoize` is equivalent to `@memoize()`:
+Or as a shorcut, use it without arguments (as a decorator, `@memoize` is equivalent to `@memoize()`):
 
     from stupydcache import memoize
 
