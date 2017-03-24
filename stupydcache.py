@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 
-import os, zlib, pickle, base64, string, hashlib
+import os, zlib, pickle, base64, string, hashlib, functools
 
 # for 2/3 compatibility
 try:
@@ -70,35 +70,36 @@ class Cache:
     def get(self, key, default=None):
         return self[key] if key in self else default
 
-def memoize(obj):
+def memoize(cachedir='cache', cachename=None):
     "simple memoizing decorator, works on functions, methods, or classes"
     "inspired by https://wiki.python.org/moin/PythonDecoratorLibrary"
+    def memoizer_decorator(obj):
+        # try to minimize conflicts between different caches by constructing more or less unique name
+        if cachename is None:
+            if '__name__' in dir(obj):
+                localcachename = obj.__name__
+            else:
+                localcachename = ''
+            localcachename += str(type(obj))
+        else:
+            localcachename = cachename
 
-    cache = obj.cache = {}
-    @functools.wraps(obj)
-    def memoizer(*args, **kwargs):
-        key = str(args) + str(kwargs)
-        if key not in cache:
-           cache[key] = obj(*args, **kwargs)
-           return cache[key]
-    return memoizer
+        cache = Cache(cachedir, localcachename)
+
+        @functools.wraps(obj)
+        def memoizer(*args, **kwargs):
+            key = (args, kwargs)
+            if key in cache:
+                val = cache[key]
+            else:
+                val = obj(*args, **kwargs)
+                cache[key] = val
+            return val
+        return memoizer
+
+    return memoizer_decorator
 
 
 if __name__=='__main__':
-    # test
-    cache = Cache(cachedir='/tmp/testcache', name='TESTČ')
-    k1 = u'kľúč1'
-    v1 = [1,2,3,4,5, 'šesť', b'sedem', {1,2,3}]
-    cache[k1] = v1
-    assert k1 in cache
-    assert cache[k1] == v1
-    k2 = 123.45
-    v2 = 10
-    cache[k2] = v2
-    assert k2 in cache
-    assert cache[k2] == v2
-
-    print(cache.get(k1,'ble'))
-    print ('k2' in cache)
-    print(cache['kľúč2']) # should fail with KeyError
+    pass
 
