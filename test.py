@@ -24,7 +24,7 @@ print('OK')
 
 print('testing memoize:')
 
-@memoize()
+@memoize
 def fib(n):
     print('Calculating fib({})'.format(n))
     if n<0:

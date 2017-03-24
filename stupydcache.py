@@ -70,9 +70,10 @@ class Cache:
     def get(self, key, default=None):
         return self[key] if key in self else default
 
-def memoize(cachedir='cache', cachename=None):
+def memoize(func=None, cachedir='cache', cachename=None):
     "simple memoizing decorator, works on functions, methods, or classes"
     "inspired by https://wiki.python.org/moin/PythonDecoratorLibrary"
+
     def memoizer_decorator(obj):
         # try to minimize conflicts between different caches by constructing more or less unique name
         if cachename is None:
@@ -96,6 +97,10 @@ def memoize(cachedir='cache', cachename=None):
                 cache[key] = val
             return val
         return memoizer
+
+    # if this is used as a decorator without arguments
+    if func is not None and callable(func):
+        return memoizer_decorator(func)
 
     return memoizer_decorator
 
