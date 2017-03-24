@@ -10,6 +10,20 @@ try:
 except NameError:
     unicode = ()
 
+
+def memoize(obj):
+    "simple memoizing decorator, works on functions, methods, or classes"
+    "inspired by https://wiki.python.org/moin/PythonDecoratorLibrary"
+
+    cache = obj.cache = {}
+    @functools.wraps(obj)
+    def memoizer(*args, **kwargs):
+        key = str(args) + str(kwargs)
+        if key not in cache:
+           cache[key] = obj(*args, **kwargs)
+           return cache[key]
+    return memoizer
+
 class Cache:
     "general on-disk cache"
     def __init__(self, cachedir='cache', name=''):
