@@ -8,21 +8,18 @@ import os, zlib, pickle, base64, string, hashlib
 try:
     unicode
 except NameError:
+    # this happens in python3
     unicode = ()
 
-
-def memoize(obj):
-    "simple memoizing decorator, works on functions, methods, or classes"
-    "inspired by https://wiki.python.org/moin/PythonDecoratorLibrary"
-
-    cache = obj.cache = {}
-    @functools.wraps(obj)
-    def memoizer(*args, **kwargs):
-        key = str(args) + str(kwargs)
-        if key not in cache:
-           cache[key] = obj(*args, **kwargs)
-           return cache[key]
-    return memoizer
+def smart_str(obj):
+    "smart version of str(), works in both python2/3, regardless of whether obj is an unicode or a string or bytes"
+    if isinstance(obj, unicode): # for python3, it gives False, because unicode==()
+        s = obj.encode('utf-8')  # but for python2, we have to use a string, not unicode string
+    elif not isinstance(obj, str):
+        s = str(obj)
+    else: # obj is already a string
+        s = obj
+    return s
 
 class Cache:
     "general on-disk cache"
@@ -36,10 +33,8 @@ class Cache:
         self.name = name
 
     def _to_safe(self, s):
-        if isinstance(s, unicode): # for python3, it gives False, because unicode==()
-            s = s.encode('utf-8')  # but for python2, we have to use string, not unicode string
-        elif not isinstance(s, str):
-            s = str(s)
+        "helper function to extract only filesystem-safe character from a string"
+        s = smart_str(s)
         return ''.join(x for x in s if x in string.ascii_letters+string.digits)
 
     def _fname(self, key):
@@ -74,6 +69,20 @@ class Cache:
 
     def get(self, key, default=None):
         return self[key] if key in self else default
+
+def memoize(obj):
+    "simple memoizing decorator, works on functions, methods, or classes"
+    "inspired by https://wiki.python.org/moin/PythonDecoratorLibrary"
+
+    cache = obj.cache = {}
+    @functools.wraps(obj)
+    def memoizer(*args, **kwargs):
+        key = str(args) + str(kwargs)
+        if key not in cache:
+           cache[key] = obj(*args, **kwargs)
+           return cache[key]
+    return memoizer
+
 
 if __name__=='__main__':
     # test
