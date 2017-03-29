@@ -1,4 +1,4 @@
-This is a simple on-disk cache for Python objects mimicking dict interface.
+This is a simple on-disk compressed cache for Python objects mimicking dict interface.
 
 Sample usage:
 
@@ -27,7 +27,10 @@ cache is persistent on disk, the next invocation of the program will use the cac
 
 The module provides one decorator, `memoize`. You can use it to decorate a
 function, each call to the function will go through the cache, the key will be
-constructed from the arguments and function name. Each subsequent call with the same arguments will use the cached value.
+constructed from the arguments and the function name. Each subsequent call with
+the same arguments will use the cached value.  Since each cache entry is a
+separate file, do not use it when you call the functions with many (as in,
+many thousands) different combinations of their arguments.
 
 You can provide a cache directory and/or a cache name:
 
