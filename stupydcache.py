@@ -61,7 +61,10 @@ class Cache:
     def __setitem__(self, key, val):
         fname = self._fname(key)
         p = pickle.dumps(val)
-        open(fname, 'wb').write(zlib.compress(p, 9))
+        # trying to get some atomicity
+        fname_tmp = fname+'.tmp'
+        open(fname_tmp, 'wb').write(zlib.compress(p, 9))
+        os.rename(fname_tmp, fname)
 
     def __contains__(self, key):
         fname = self._fname(key)
