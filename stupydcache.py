@@ -88,11 +88,17 @@ def memoize(func=None, cachedir='cache', cachename=None):
         else:
             localcachename = cachename
 
-        cache = Cache(cachedir, localcachename)
+        if isinstance(cachedir, dict):
+            cache = cachedir
+        elif isinstance(cachedir, str):
+            cache = Cache(cachedir, localcachename)
+        else:
+            raise ValueError('Expecting directory path or dictionary')
 
         @functools.wraps(obj)
         def memoizer(*args, **kwargs):
-            key = (args, kwargs)
+            kwargs_hash = kwargs if kwargs else None
+            key = (args, kwargs_hash)
             if key in cache:
                 val = cache[key]
             else:

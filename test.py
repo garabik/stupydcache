@@ -3,6 +3,9 @@
 
 from stupydcache import memoize, Cache
 
+from pprint import pprint
+
+
 print('testing cache:')
 cache = Cache(cachedir='/tmp/testcache', name='TESTČ')
 k1 = u'kľúč1'
@@ -36,8 +39,21 @@ def fib(n):
     else:
         return fib(n-1)+fib(n-2)
 
-for i in range(10):
-    print(i, fib(i))
+cd = {}
+@memoize(cachedir=cd)
+def fib2(n):
+    print('Calculating fib2({})'.format(n))
+    if n<0:
+        raise ValueError
+    elif n==0:
+        return 0
+    elif n==1:
+        return 1
+    else:
+        return fib(n-1)+fib(n-2)
 
+
+for i in range(10):
+    print(i, fib(i), fib2(i))
 
 

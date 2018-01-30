@@ -41,11 +41,29 @@ You can provide a cache directory and/or a cache name:
         ...
         return result
 
-Or as a shorcut, use it without arguments (as a decorator, `@memoize` is equivalent to `@memoize()`):
+Or as a shortcut, use it without arguments (as a decorator, `@memoize` is equivalent to `@memoize()`):
 
     from stupydcache import memoize
 
     @memoize
+    def fun(*args):
+        ...
+        return result
+
+## Caching into RAM
+
+If you use a dictionary as a cachedir, the caching will be done in RAM, using
+that dictionary, using function arguments as the dictionary keys. However, you
+run into issues - if the function arguments are unhashable, the decorator will
+raise an exception. Use with care.
+
+Do not reuse the same dictionary for different functions - only the arguments are used as the keys, not the function name.
+
+Example:
+    from stupydcache import memoize
+
+    cache_dict = {}
+    @memoize(cache_dict)
     def fun(*args):
         ...
         return result
