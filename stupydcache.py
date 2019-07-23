@@ -97,11 +97,14 @@ def memoize(func=None, cachedir='cache', cachename=None):
 
         @functools.wraps(obj)
         def memoizer(*args, **kwargs):
-            kwargs_hash = kwargs if kwargs else None
+            # kwargs keys are guaranteed to be strings, so we can sort the items to get deterministic order
+            kwargs_hash = sorted(kwargs.items()) if kwargs else None
             key = (args, kwargs_hash)
             if key in cache:
+                #print('cached', args, kwargs)
                 val = cache[key]
             else:
+                #print('unchached', args, kwargs)
                 val = obj(*args, **kwargs)
                 cache[key] = val
             return val
