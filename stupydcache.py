@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 
-import os, zlib, pickle, base64, string, hashlib, functools
+import os, zlib, pickle, base64, string, hashlib, random, functools
 
 # for 2/3 compatibility
 try:
@@ -62,7 +62,7 @@ class Cache:
         fname = self._fname(key)
         p = pickle.dumps(val)
         # trying to get some atomicity
-        fname_tmp = fname+'.tmp'
+        fname_tmp = fname+'.'+str(random.random())+'.tmp'
         open(fname_tmp, 'wb').write(zlib.compress(p, 9))
         os.rename(fname_tmp, fname)
 
