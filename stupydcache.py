@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 
-import os, zlib, pickle, base64, string, hashlib, random, functools
+import os, sys, zlib, pickle, base64, string, hashlib, random, functools
 
 # for 2/3 compatibility
 try:
@@ -10,6 +10,9 @@ try:
 except NameError:
     # this happens in python3
     unicode = ()
+
+def debug(*x):
+    print(*x, file=sys.stderr)
 
 def smart_str(obj):
     "smart version of str(), works in both python2/3, regardless of whether obj is an unicode or a string or bytes"
@@ -77,6 +80,7 @@ def memoize(func=None, cachedir='cache', cachename=None):
     "simple memoizing decorator, works on functions, methods, or classes"
     "inspired by https://wiki.python.org/moin/PythonDecoratorLibrary"
 
+
     def memoizer_decorator(obj):
         # try to minimize conflicts between different caches by constructing more or less unique name
         if cachename is None:
@@ -87,7 +91,7 @@ def memoize(func=None, cachedir='cache', cachename=None):
             localcachename += str(type(obj))
         else:
             localcachename = cachename
-
+ 
         if isinstance(cachedir, dict):
             cache = cachedir
         elif isinstance(cachedir, str):
